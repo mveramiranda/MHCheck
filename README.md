@@ -1,2 +1,2 @@
-# SWE-Untitled-Project
-TBD Project for CEN3031
+# MHCheck
+Personalized mental health checks and recommendations
