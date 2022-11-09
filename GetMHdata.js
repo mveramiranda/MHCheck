@@ -39,7 +39,7 @@ for (let i = 0; i < 1000000; i++) {
 }
 
 y = 0
-for (let i = 0; i <= 5; i++){
+for (let i = 0; i <= 1000000; i++){
 frame = ""
 document.getElementsByClassName("antbits-SA-std_btn")[0].click()
 
