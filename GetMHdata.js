@@ -5,6 +5,33 @@
 / dump data over time to a file to prevent from having to
 / copy a multi million line object that crashes chrome */
 
+(function(console){
+
+console.save = function(data, filename){
+
+    if(!data) {
+        console.error('Console.save: No data')
+        return;
+    }
+
+    if(!filename) filename = 'console.json'
+
+    if(typeof data === "object"){
+        data = JSON.stringify(data, undefined, 4)
+    }
+
+    var blob = new Blob([data], {type: 'text/json'}),
+        e    = document.createEvent('MouseEvents'),
+        a    = document.createElement('a')
+
+    a.download = filename
+    a.href = window.URL.createObjectURL(blob)
+    a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':')
+    e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+    a.dispatchEvent(e)
+ }
+})(console)
+
 nums = []
 data = {}
 for (let i = 0; i < 1000000; i++) {
@@ -12,7 +39,7 @@ for (let i = 0; i < 1000000; i++) {
 }
 
 y = 0
-for (let i = 0; i <= 1000000; i++){
+for (let i = 0; i <= 5; i++){
 frame = ""
 document.getElementsByClassName("antbits-SA-std_btn")[0].click()
 
@@ -33,6 +60,10 @@ for (let x = 0; x <= 17; x++){
 		document.getElementById("antbits-SA-answer_"+x+"_"+p).click()
 		await new Promise(r => setTimeout(r, 200))
 		document.getElementById("antbits-SA-nav_next").click()
+		if (i % 500) {
+			console.save(data)
+			data = {}
+		}
 }
 
 await new Promise(r => setTimeout(r, 2000))
@@ -47,3 +78,4 @@ document.getElementById("antbits-SA-nav_links").click()
 document.getElementById("antbits-SA-nav_finish").click()
 await new Promise(r => setTimeout(r, 500))
 }
+console.save(data)
