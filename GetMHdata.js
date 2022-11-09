@@ -60,7 +60,7 @@ for (let x = 0; x <= 17; x++){
 		document.getElementById("antbits-SA-answer_"+x+"_"+p).click()
 		await new Promise(r => setTimeout(r, 200))
 		document.getElementById("antbits-SA-nav_next").click()
-		if (i % 500) {
+		if (i % 500 == 0 && i != 0) {
 			console.save(data)
 			data = {}
 		}
