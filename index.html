@@ -1,152 +1,72 @@
-<header>
-    <script type="text/javascript">
-        function getRadioClicked(name) {
-            /*
-            * This function takes in a (usually shared) name used for a question and 
-            * iterates over the radio buttons that share it to find out which one is clicked.
-            * Only one can be clicked per due to how radio buttons work, so there aren't any errors
-            *  Takes in a string, returns a string (the id of the button, which is being used to represent the value of the answer from 0 to 3)
-            */
-            let choices = document.getElementsByName(name);
-            var val = "";
-            for (let i = 0; i < choices.length; i++) {
-                if (choices[i].checked)
-                    val = choices[i].id;
-            }
-            return val
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="Style.css">
+</head>
+<script type="text/javascript">
+    function getRadioClicked(name) {
+        /*
+        * This function takes in a (usually shared) name used for a question and 
+        * iterates over the radio buttons that share it to find out which one is clicked.
+        * Only one can be clicked per due to how radio buttons work, so there aren't any errors
+        *  Takes in a string, returns a string (the id of the button, which is being used to represent the value of the answer from 0 to 3)
+        */
+        let choices = document.getElementsByName(name);
+        var val = "";
+        for (let i = 0; i < choices.length; i++) {
+            if (choices[i].checked)
+                val = choices[i].id;
         }
+        return val
+    }
 
-        function fillRandom() {
-            /*
-            * This function randomly inputs data into the form; this is for debug use
-            */
-            for (let i = 1; i <= 17; i++) {
-                let num = Math.floor(Math.random() * 4);
-                if (i == 9) {
-                    num = num % 2;
-                }
-                document.getElementsByName("q"+i)[num].checked=true
+    function fillRandom() {
+        /*
+        * This function randomly inputs data into the form; this is for debug use
+        */
+        for (let i = 1; i <= 17; i++) {
+            let num = Math.floor(Math.random() * 4);
+            if (i == 9) {
+                num = num % 2;
             }
+            document.getElementsByName("q"+i)[num].checked=true
         }
+    }
 
-        function calculate() {
-            /*
-            * This function is called when the form is submitted.
-            * If a question is not answered, it will fail and alert the user.
-            * Otherwise, it'll calculate total score and edit the score label with it.
-            * Ideally, this will be handled differently later and score won't just be a number added up
-            */
-            var total = 0;
-            var destination = document.getElementById("total");
-            for (let i = 1; i <= 17; i++) {
-                let num = getRadioClicked("q" + i);
-                if (num == "") {
-                    alert("You didnt answer question #" + i);
-                    return;
-                }
-                num = Number(num)
-                if (i == 9)
-                    num *= 2;
-                total += num;
+    function calculate() {
+        /*
+        * This function is called when the form is submitted.
+        * If a question is not answered, it will fail and alert the user.
+        * Otherwise, it'll calculate total score and edit the score label with it.
+        * Ideally, this will be handled differently later and score won't just be a number added up
+        */
+        var total = 0;
+        var destination = document.getElementById("total");
+        for (let i = 1; i <= 17; i++) {
+            let num = getRadioClicked("q" + i);
+            if (num == "") {
+                alert("You didnt answer question #" + i);
+                return;
             }
-            destination.innerHTML = String(total);
+            num = Number(num)
+            if (i == 9)
+                num *= 2;
+            total += num;
         }
+        destination.innerHTML = String(total);
+    }
 
-    </script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
-        import { getAuth, signOut, signInWithPopup, GoogleAuthProvider} from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
-      
-        // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-        const firebaseConfig = {
-          apiKey: "AIzaSyDHnJYWxwO4jlsGbAAuHvE977m_TIWFEs8",
-          authDomain: "mhcheck-f5182.firebaseapp.com",
-          projectId: "mhcheck-f5182",
-          storageBucket: "mhcheck-f5182.appspot.com",
-          messagingSenderId: "104901433458",
-          appId: "1:104901433458:web:14acf9ea7be44e84d88aeb",
-          measurementId: "G-WRXQXF8FYG"
-        };
-        
-      
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app)
-        const analytics = getAnalytics(app);
-        const provider = new GoogleAuthProvider(app);
-
-        function googleLogin () {//for whatever has id = 'login'
-            signInWithPopup(auth, provider)
-                .then((result) => {
-                    // This gives you a Google Access Token. You can use it to access the Google API.
-                    const credential = GoogleAuthProvider.credentialFromResult(result);
-                    const token = credential.accessToken;
-                    // The signed-in user info.
-                    const user = result.user;
-
-                    //user info
-                    //photo = photoURL
-                    //name = displayName
-                    //email = email
-                    document.getElementById("username").innerHTML = "You are currently signed in as <b>" + user.displayName + "</b>"
-                    document.getElementById("signout").style.visibility="visible"
-                    // ...
-                }).catch((error) => {
-                    // Handle Errors here.
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    // The email of the user's account used.
-                    const email = error.customData.email;
-                    // The AuthCredential type that was used.
-                    const credential = GoogleAuthProvider.credentialFromError(error);
-                    // ...
-                    alert(errorMessage);
-                });
-        };
-
-        function logout() {
-            signOut(auth).then(() => { 
-                document.getElementById("username").innerHTML = "You are currently <b>not signed in</b>"
-                document.getElementById("signout").style.visibility = "hidden"
-        
-            }).catch((error) => { 
-
-                //console.log(error)
-                alert(errorMessage);
-            });
-        };
-
-        /*function checkAuthState(){
-
-            firebase.auth().onStateChanged(user=>{
-
-                if(user){
-                    showUserDetails(user)
-                    //document.getElementById('user-info').innerHTML = '<p> Name:  ${user} </p>'
-                    alert(user.displayName)
-                }else{
-                    
-                }
-            })
-        }*/
-
-
-        checkAuthState()
-    </script>
-</header>
+</script>
 <body>
     <h1>Questionnaire Page</h1>
     <p>The questions come from <a href="https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/depression-anxiety-self-assessment-quiz/">The NHS</a></p>
-    <form name="login">
-        <br>
-        <label id="username">You are currently <b>not signed in</b></label>
-        <button id="logingoogle" onclick="googleLogin()">Log in with Google</button> <button id="signout" onclick="logout()" style="visibility:hidden">Sign out</button>
-    </form>
-
+    <button id = "login" >Login w/ Google</button>
+    <button id = "signoff" >Sign Out</button>
+    <p id = "user-info">You are <b>not</b> signed in.</p>
     <script>
         //These are the functions to change the background and font colors to allow users an option to ease their eyes
 
@@ -291,5 +211,105 @@
         Total points (this is for debugging): <label id="total">0</label>
         <input type="button" name="submit" onclick="calculate();" value="Calculate!">
     </form>
-    <button name="fill random" onclick="fillRandom();">Fill with random answers</button>
+    <button name="fill random" onclick="fillRandom();">Fill with random answers</button>    
+    <script type="module">
+
+        //!!!!!!!!!!!!!!!!!!!!!DONT PUT DISPLAYED STUFF IN HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
+        import { getAuth, signOut, signInWithPopup, GoogleAuthProvider} from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyDHnJYWxwO4jlsGbAAuHvE977m_TIWFEs8",
+          authDomain: "mhcheck-f5182.firebaseapp.com",
+          projectId: "mhcheck-f5182",
+          storageBucket: "mhcheck-f5182.appspot.com",
+          messagingSenderId: "104901433458",
+          appId: "1:104901433458:web:14acf9ea7be44e84d88aeb",
+          measurementId: "G-WRXQXF8FYG"
+        };
+
+        
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app)
+        const analytics = getAnalytics(app);
+        const provider = new GoogleAuthProvider(app);
+
+        login.addEventListener('click',(e) =>{//for whatever has id = 'login'
+
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    // The signed-in user info.
+                    const user = result.user;
+
+
+                    //user info
+                    //photo = photoURL
+                    //name = displayName
+                    //email = email
+                    alert(user.displayName);
+                    document.getElementById("user-info").innerHTML = "Signed in as <b>" + user.displayName + "</b>"
+                    // ...
+                }).catch((error) => {
+                    // Handle Errors here.
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    // The email of the user's account used.
+                    const email = error.customData.email;
+                    // The AuthCredential type that was used.
+                    const credential = GoogleAuthProvider.credentialFromError(error);
+                    // ...
+
+                    alert(errorMessage);
+                });
+               
+
+        });
+
+        signoff.addEventListener('click',(e) =>{
+
+            signOut(auth).then(() => { 
+                alert("signed out") 
+                document.getElementById("user-info").innerHTML = "You are <b>not</b> signed in."
+        
+            }).catch((error) => { 
+
+                //console.log(error)
+                alert(errorMessage);
+            });
+
+
+        });
+
+        /*function checkAuthState(){
+
+            firebase.auth().onStateChanged(user=>{
+
+                if(user){
+                    showUserDetails(user)
+                    //document.getElementById('user-info').innerHTML = '<p> Name:  ${user} </p>'
+                    alert(user.displayName)
+                }else{
+                    
+                }
+            })
+        }*/
+
+
+        checkAuthState()
+        
+    </script>
+    
 </body>
+</html>
