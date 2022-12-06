@@ -1,6 +1,12 @@
 <header>
     <script type="text/javascript">
         function getRadioClicked(name) {
+            /*
+            * This function takes in a (usually shared) name used for a question and 
+            * iterates over the radio buttons that share it to find out which one is clicked.
+            * Only one can be clicked per due to how radio buttons work, so there aren't any errors
+            *  Takes in a string, returns a string (the id of the button, which is being used to represent the value of the answer from 0 to 3)
+            */
             let choices = document.getElementsByName(name);
             var val = "";
             for (let i = 0; i < choices.length; i++) {
@@ -15,6 +21,9 @@
         }
 
         function fillRandom() {
+            /*
+            * This function randomly inputs data into the form; this is for debug use
+            */
             for (let i = 1; i <= 17; i++) {
                 let num = Math.floor(Math.random() * 4);
                 if (i == 9) {
@@ -25,6 +34,12 @@
         }
 
         function calculate() {
+            /*
+            * This function is called when the form is submitted.
+            * If a question is not answered, it will fail and alert the user.
+            * Otherwise, it'll calculate total score and edit the score label with it.
+            * Ideally, this will be handled differently later and score won't just be a number added up
+            */
             var total = 0;
             var destination = document.getElementById("total");
             for (let i = 1; i <= 17; i++) {
