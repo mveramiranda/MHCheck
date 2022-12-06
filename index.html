@@ -1,6 +1,12 @@
 <header>
     <script type="text/javascript">
         function getRadioClicked(name) {
+            /*
+            * This function takes in a (usually shared) name used for a question and 
+            * iterates over the radio buttons that share it to find out which one is clicked.
+            * Only one can be clicked per due to how radio buttons work, so there aren't any errors
+            *  Takes in a string, returns a string (the id of the button, which is being used to represent the value of the answer from 0 to 3)
+            */
             let choices = document.getElementsByName(name);
             var val = "";
             for (let i = 0; i < choices.length; i++) {
@@ -11,6 +17,9 @@
         }
 
         function fillRandom() {
+            /*
+            * This function randomly inputs data into the form; this is for debug use
+            */
             for (let i = 1; i <= 17; i++) {
                 let num = Math.floor(Math.random() * 4);
                 if (i == 9) {
@@ -21,6 +30,12 @@
         }
 
         function calculate() {
+            /*
+            * This function is called when the form is submitted.
+            * If a question is not answered, it will fail and alert the user.
+            * Otherwise, it'll calculate total score and edit the score label with it.
+            * Ideally, this will be handled differently later and score won't just be a number added up
+            */
             var total = 0;
             var destination = document.getElementById("total");
             for (let i = 1; i <= 17; i++) {
@@ -38,10 +53,155 @@
         }
 
     </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
+        import { getAuth, signOut, signInWithPopup, GoogleAuthProvider} from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyDHnJYWxwO4jlsGbAAuHvE977m_TIWFEs8",
+          authDomain: "mhcheck-f5182.firebaseapp.com",
+          projectId: "mhcheck-f5182",
+          storageBucket: "mhcheck-f5182.appspot.com",
+          messagingSenderId: "104901433458",
+          appId: "1:104901433458:web:14acf9ea7be44e84d88aeb",
+          measurementId: "G-WRXQXF8FYG"
+        };
+        
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app)
+        const analytics = getAnalytics(app);
+        const provider = new GoogleAuthProvider(app);
+
+        function googleLogin () {//for whatever has id = 'login'
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    // The signed-in user info.
+                    const user = result.user;
+
+                    //user info
+                    //photo = photoURL
+                    //name = displayName
+                    //email = email
+                    document.getElementById("username").innerHTML = "You are currently signed in as <b>" + user.displayName + "</b>"
+                    document.getElementById("signout").style.visibility="visible"
+                    // ...
+                }).catch((error) => {
+                    // Handle Errors here.
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    // The email of the user's account used.
+                    const email = error.customData.email;
+                    // The AuthCredential type that was used.
+                    const credential = GoogleAuthProvider.credentialFromError(error);
+                    // ...
+                    alert(errorMessage);
+                });
+        };
+
+        function logout() {
+            signOut(auth).then(() => { 
+                document.getElementById("username").innerHTML = "You are currently <b>not signed in</b>"
+                document.getElementById("signout").style.visibility = "hidden"
+        
+            }).catch((error) => { 
+
+                //console.log(error)
+                alert(errorMessage);
+            });
+        };
+
+        /*function checkAuthState(){
+
+            firebase.auth().onStateChanged(user=>{
+
+                if(user){
+                    showUserDetails(user)
+                    //document.getElementById('user-info').innerHTML = '<p> Name:  ${user} </p>'
+                    alert(user.displayName)
+                }else{
+                    
+                }
+            })
+        }*/
+
+
+        checkAuthState()
+    </script>
 </header>
 <body>
     <h1>Questionnaire Page</h1>
     <p>The questions come from <a href="https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/depression-anxiety-self-assessment-quiz/">The NHS</a></p>
+    <form name="login">
+        <br>
+        <label id="username">You are currently <b>not signed in</b></label>
+        <button id="logingoogle" onclick="googleLogin()">Log in with Google</button> <button id="signout" onclick="logout()" style="visibility:hidden">Sign out</button>
+    </form>
+
+    <script>
+        //These are the functions to change the background and font colors to allow users an option to ease their eyes
+
+        function blackOnWhite() {
+            document.body.style.color = "black";
+            document.body.style.backgroundColor = "white";
+        }
+        function greenOnWhite() {
+            document.body.style.color = "#003300";
+            document.body.style.backgroundColor = "white";
+        }
+        function blueOnWhite() {
+            document.body.style.color = "#000033";
+            document.body.style.backgroundColor = "white";
+        }
+        function umberOnWhite() {
+            document.body.style.color = "#330000";
+            document.body.style.backgroundColor = "white";
+        }
+        function whiteOnGray() {
+            document.body.style.color = "#FFFFFF";
+            document.body.style.backgroundColor = "#333333"
+        }
+        function cyanOnBlack() {
+            document.body.style.color = "#00FFFF";
+            document.body.style.backgroundColor = "black";
+        }
+        function silverOnBlack() {
+            document.body.style.color = "#CCCCCC";
+            document.body.style.backgroundColor = "black";
+        }
+        function palette() { //the function to reveal the palette and hide the palette button
+            document.getElementById("paletteSelector").style.display = "block";
+            document.getElementById("paletteButton").style.display = "none";
+        }
+        function hidePalette() { //function to hide the palette again and to reveal the button
+            document.getElementById("paletteSelector").style.display = "none";
+            document.getElementById("paletteButton").style.display = "block";
+        }
+    </script>
+
+    <p id="paletteButton">
+        <button onclick="palette()">Color Palette</button><br />
+    </p>
+
+    <p id="paletteSelector" style="display: none">
+        <button onclick="blackOnWhite()">Black font White Background</button><br />
+        <button onclick="greenOnWhite()">Green font White Background</button><br />
+        <button onclick="blueOnWhite()">Blue font White Background</button><br />
+        <button onclick="umberOnWhite()">Umber font White Background</button><br />
+        <button onclick="whiteOnGray()">White font Gray Background</button><br />
+        <button onclick="cyanOnBlack()">Cyan font Black Background</button><br />
+        <button onclick="silverOnBlack()">Silver font Black Background</button><br />
+        <button onclick="hidePalette()">Hide Palette</button>
+    </p>
 
     <form name="questions">
         1. How often have you been bothered by feeling down, depressed or hopeless?<br>
