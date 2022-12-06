@@ -61,11 +61,69 @@
 <body>
     <h1>Questionnaire Page</h1>
     <p>The questions come from <a href="https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/depression-anxiety-self-assessment-quiz/">The NHS</a></p>
-    <form name="login"><br>
+    <form name="login">
+        <br>
         Username: <input type="text" id="username" name="username"><br>
         Password: <input type="password" id="password" name="password"><br>
         <button onclick="login()">Log In</button>
     </form>
+
+    <script>
+        //These are the functions to change the background and font colors to allow users an option to ease their eyes
+
+        function blackOnWhite() {
+            document.body.style.color = "black";
+            document.body.style.backgroundColor = "white";
+        }
+        function greenOnWhite() {
+            document.body.style.color = "#003300";
+            document.body.style.backgroundColor = "white";
+        }
+        function blueOnWhite() {
+            document.body.style.color = "#000033";
+            document.body.style.backgroundColor = "white";
+        }
+        function umberOnWhite() {
+            document.body.style.color = "#330000";
+            document.body.style.backgroundColor = "white";
+        }
+        function whiteOnGray() {
+            document.body.style.color = "#FFFFFF";
+            document.body.style.backgroundColor = "#333333"
+        }
+        function cyanOnBlack() {
+            document.body.style.color = "#00FFFF";
+            document.body.style.backgroundColor = "black";
+        }
+        function silverOnBlack() {
+            document.body.style.color = "#CCCCCC";
+            document.body.style.backgroundColor = "black";
+        }
+        function palette() { //the function to reveal the palette and hide the palette button
+            document.getElementById("paletteSelector").style.display = "block";
+            document.getElementById("paletteButton").style.display = "none";
+        }
+        function hidePalette() { //function to hide the palette again and to reveal the button
+            document.getElementById("paletteSelector").style.display = "none";
+            document.getElementById("paletteButton").style.display = "block";
+        }
+    </script>
+
+    <p id="paletteButton">
+        <button onclick="palette()">Color Palette</button><br />
+    </p>
+
+    <p id="paletteSelector" style="display: none">
+        <button onclick="blackOnWhite()">Black font White Background</button><br />
+        <button onclick="greenOnWhite()">Green font White Background</button><br />
+        <button onclick="blueOnWhite()">Blue font White Background</button><br />
+        <button onclick="umberOnWhite()">Umber font White Background</button><br />
+        <button onclick="whiteOnGray()">White font Gray Background</button><br />
+        <button onclick="cyanOnBlack()">Cyan font Black Background</button><br />
+        <button onclick="silverOnBlack()">Silver font Black Background</button><br />
+        <button onclick="hidePalette()">Hide Palette</button>
+    </p>
+
     <form name="questions">
         1. How often have you been bothered by feeling down, depressed or hopeless?<br>
         <input type="radio" id="0" name="q1">Not at all<br>
