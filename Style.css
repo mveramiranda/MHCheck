@@ -8,4 +8,22 @@
     background: blue;
     position: relative;
     border-radius: 10px;
+    display:none;
+
+}
+
+#dash{
+    position:relative;
+    background:none;
+    width:20em;
+}
+
+
+
+#score-display{
+    
+    height:10px;
+    position: relative;
+    width: 50px;
+    
 }
