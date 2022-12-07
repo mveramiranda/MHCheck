@@ -37,37 +37,6 @@
         }
     }
 
-    async function calculate2() {
-        /*
-        * This function is called when the form is submitted.
-        * If a question is not answered, it will fail and alert the user.
-        * Otherwise, it'll calculate total score and edit the score label with it.
-        * Ideally, this will be handled differently later and score won't just be a number added up
-        */
-        var total = 0;
-        var destination = document.getElementById("total");
-        for (let i = 1; i <= 17; i++) {
-            let num = getRadioClicked("q" + i);
-            if (num == "") {
-                alert("You didnt answer question #" + i);
-                return;
-            }
-            num = Number(num)
-            if (i == 9)
-                num *= 2;
-            total += num;
-        }
-        destination.innerHTML = String(total);
-
-       /* const scoreRef = doc(db, "scoring", uMail);
-
-            // Atomically add a new region to the "regions" array field.
-            await updateDoc(scoreRef, {
-                scores: arrayUnion(total)
-            });*/
-
-         return total;   
-    }
 
 </script>
 <body>
