@@ -66,7 +66,7 @@
     <p>The questions come from <a href="https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/depression-anxiety-self-assessment-quiz/">The NHS</a></p>
     <button id = "login" >Login w/ Google</button>
     <button id = "signoff" >Sign Out</button>
-    <p id = "user-info">You are <b>not</b> signed in.</p>
+    <p id = "user-info">You are <strong>not</strong> signed in.</p>
     <script>
         //These are the functions to change the background and font colors to allow users an option to ease their eyes
 
@@ -259,7 +259,7 @@
                     //name = displayName
                     //email = email
                     alert(user.displayName);
-                    document.getElementById("user-info").innerHTML = "Signed in as <b>" + user.displayName + "</b>"
+                    document.getElementById("user-info").innerHTML = "Signed in as <strong>" + user.displayName + "<strong>"
                     // ...
                 }).catch((error) => {
                     // Handle Errors here.
