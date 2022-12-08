@@ -40,9 +40,10 @@
 
 </script>
 <body>
-    <h1>Questionnaire Page</h1>
-    <p>The questions come from <a href="https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/depression-anxiety-self-assessment-quiz/">The NHS</a></p>
-    <button id = "login" >Login w/ Google</button>
+    <h1>MHCheck</h1>
+    <p> Welcome to MHCheck! A simple questionnaire to assess your current mental health.</p>
+    <p>The questions were designed by the United Kingdom's <a href="https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/depression-anxiety-self-assessment-quiz/">NHS</a>.</p>
+    <button id = "login" >Login w/ Google to save your result.</button>
     <button id = "signoff" >Sign Out</button>
     <p id = "user-info">You are <strong>not</strong> signed in.</p>
     <div id = "dash"><p id = "score-display"> </p></div>
@@ -87,6 +88,8 @@
         }
     </script>
 
+    <p>In the following menu, you can choose the UI combination that looks best for you: </p>
+
     <p id="paletteButton">
         <button onclick="palette()">Color Palette</button><br />
     </p>
@@ -101,7 +104,9 @@
         <button onclick="silverOnBlack()">Silver font Black Background</button><br />
         <button onclick="hidePalette()">Hide Palette</button>
     </p>
-
+    <h2> Questionnaire</h2>
+    <p>When answering each of the questions, think about how you have felt in the past 2 weeks. Please answer each question truthfully.</p>
+    <p>Once you have picked the most accurate answers for each of the questions, click the <strong> What is my score?</strong> button</p>
     <form name="questions">
         1. How often have you been bothered by feeling down, depressed or hopeless?<br>
         <input type="radio" id="0" name="q1">Not at all<br>
@@ -187,14 +192,20 @@
         <input type="radio" id="2" name="q17">Very difficult<br>
         <input type="radio" id="3" name="q17">Extremely difficult<br>
 
-        Total Points : <label id="total">0</label>
-        <input type="button" name="submit" id = "calc" value="Calculate!">
+        Your MHCheck score is: <label id="total">0</label>
+        <input type="button" name="submit" id = "calc" value="What is my score?">
+        <p>The MHCheck score you receive is out of 50. A high score will reflect potential symptoms of anxiety and depression in the past weeks.</p>
+    <p>If that is the case, we encourage you to consult a mental health professional to better understand what is happening and how to handle it best. </p>
+    <p>In the meantime, you can refer to <a href= https://www.healthline.com/health/mental-health/depression-and-anxiety#treatment>this</a> article for more information and guidance.</p>
         <!-- {onclick="calculate();"}*/-->
     </form>
+    <!--TODO: remove after debugging complete-->
     <button name="fill random" onclick="fillRandom();">Fill with random answers</button>    
     <script type="module">
-
-        //!!!!!!!!!!!!!!!!!!!!!DONT PUT DISPLAYED STUFF IN HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        /*
+        * The following module deals with all of the firebase implementation, including implementing google login,
+        * saving the user scores into the firestore database, and retrieveing those previous scores.
+        */
 
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
@@ -226,135 +237,88 @@
         const analytics = getAnalytics(app);
         const provider = new GoogleAuthProvider(app);
 
-        
+        //Access the firestore database
         const database = getDatabase();
 		const db = getFirestore(app);
-
-        /*
-         //add to some div that displays number constantly when user is signed in
-        try{
-            
         
-            const docRef = doc(db,"scoring", uMail);
-            const docSnap = await getDoc(docRef);
 
-            if (docSnap.exists()) {
-            console.log("Document data:", docSnap.data());
-            } else {
-            // doc.data() will be undefined in this case
-            console.log("No such document!");
-            }
+        //async function that retrieves and shows the previous user score
+        async function showScore(){
 
-        }catch(e){
-            console.log("uMail is probably blank")
-
-        }
-        //for reading score ad added to dashboard
-        */
-
-        //review.addEventListener('click',(e)=>{ 
-            
-
-            async function showScore(){
-
-                if(uMail != ""){
-                //document.getElementById("dash").innerHTML = "Signed in as <strong>" + user.displayName + "<strong>"
-                    const docRef = doc(db,"scoring", uMail);
-                    const docSnap = await getDoc(docRef);
-
-                    if (docSnap.exists()) {
-                        //console.log("Document data:", docSnap.data());
-                        
-                     //var scr = docSnap.data()
-                     var scr = docSnap.get("scores");
-                     if(scr.length != 0){
-                        document.getElementById("score-display").innerHTML = "<strong>Latest Score:<strong> " + scr[scr.length-1] ;// scr.length;//.value[0].scores;//String(scr.value[0]);
-                     }else{
-                        document.getElementById("score-display").innerHTML = "<strong>No Quiz History<strong> " ;// scr.length;//.value[0].scores;//String(scr.value[0]);
-                   
-                     }
-                        //console.log(String(scr[0]));
-                    } else {
-                    // doc.data() will be undefined in this case
-                    //console.log("No such document!");
+            if(uMail != "") {
+                const docRef = doc(db,"scoring", uMail);
+                const docSnap = await getDoc(docRef);
+                    
+                if (docSnap.exists()) {
+                    try { //if the user has taken the quiz before, simply display the latest score
+                        var scr = docSnap.get("scores");
+                        if(scr.length != 0){
+                            document.getElementById("score-display").innerHTML = "<strong>Your latest MHCheck score was:<strong> " + scr[scr.length-1] ;
+                        }
                     }
-                }else{
-                    document.getElementById("score-display").innerHTML = "<strong>Please Login to Record Progress<strong> " ;// scr.length;//.value[0].scores;//String(scr.value[0]);
-                     
-                    //alert("Please Login to Record Your Progress");
+                    catch(error) { //if the user does not have any previous scores, display the corresponding message
+                        document.getElementById("score-display").innerHTML = "<strong>There are no previous MHCheck scores<strong> " ;
+                    }
+                } 
+                else { //defines the user into the database if they haven't accessed MHCheck prevciously
+                    await setDoc(docRef, {
+                        scores: {}
+                    });
+                    document.getElementById("score-display").innerHTML = "<strong>There are no previous MHCheck scores<strong> " ;
                 }
             }
-            
-            showScore();
-        //});
+            else{ //if the user is a guest, display a message that envourages login
+                document.getElementById("score-display").innerHTML = "<strong>If you wish to record your progress, please sign in above with your Google account.</strong>" ;
+                }
+        }
+        
+        //displaye the user score if they are signed in
+        showScore();
         
 
+        // this event listener waits until the user clicks the calculate score button to determine it
         calc.addEventListener('click',(e)=>{ //add the total to database
+            
 
-            //console.log("pressed calculate!")
-
-            //console.log("pressed calculate!")
-            if(uMail != ""){
-
-                    const scoreRef = doc(db, "scoring", uMail);
-                    //console.log("pressed calculate!")
-
-                    async function calculate(){
-                        //console.log("pressed calculate!")
-                                var total = 0;
-                                var destination = document.getElementById("total");
-                                for (let i = 1; i <= 17; i++) {
-                                    let num = getRadioClicked("q" + i);
-                                    if (num == "") {
-                                        alert("You didnt answer question #" + i);
-                                        return;
-                                    }
-                                    num = Number(num)
-                                    if (i == 9)
-                                        num *= 2;
-                                    total += num;
-                                }
-                                destination.innerHTML = String(total);
-
-                                //console.log("pressed calculate!")
-
-                            //console.log("pressed calculate!")
-        
-
-                                //const scoreRef = doc(db, "scoring", uMail);
-
-                                // Atomically add a new region to the "regions" array field.
-                            await updateDoc(scoreRef, {
-                                    scores: arrayUnion(total)
-                                });
-
-                        return total;
+            //functiont o calculate the user scores
+            async function calculate(){
+                var total = 0;
+                
+                //get the general score
+                for (let i = 1; i <= 17; i++) {
+                    let num = getRadioClicked("q" + i);
+                    if (num == "") {
+                        alert("You didnt answer question #" + i);
+                        return;
                     }
+                    num = Number(num)
+                    if (i == 9)
+                        num *= 2;
+                    total += num;
+                }
+                
+                var destination = document.getElementById("total");
+                destination.innerHTML = String(total);
+                
+                //if the user is signed in, adds it into their database
+                if (uMail != "") {
+                    console.log("here");
+                    const scoreRef = doc(db, "scoring", uMail);
+                    await updateDoc(scoreRef, {
+                        scores: arrayUnion(total)
+                    });
+                }
 
-                    calculate();//actually have to call it
-                    showScore();
-
-            }else{
-                alert("Please Login Before Answering Quiz")
+                return total;
             }
 
-
-
-           
-            
-            
-
+            calculate();
+            showScore();
         });
 		
-        if(uMail != ""){
-            showScore();
-        }
-
-
+        //event listener for user log ins
         login.addEventListener('click',(e) =>{//for whatever has id = 'login'
-                //console.log("CLICKED IT");
             
-      
             signInWithPopup(auth, provider)
                 .then((result) => {
                     
@@ -368,13 +332,7 @@
                     uName = user.name;
 
                     //user info
-                    //photo = photoURL
-                    //name = displayName
-                    //email = email
-                    //alert(user.displayName);
                     document.getElementById("user-info").innerHTML = "Signed in as <strong>" + user.displayName + "<strong>"
-                    // ...
-                    
                     
                     document.getElementById("login").style.display = "none";
                     document.getElementById("signoff").style.display = "block";
@@ -394,18 +352,15 @@
 
                     //alert(errorMessage);
                 });
-                
-                //showScore();
-                
-            
 
         });
 
+        //event listener for user sign out. works similarly as the login
         signoff.addEventListener('click',(e) =>{
 
             signOut(auth).then(() => { 
                 //alert("signed out") 
-                document.getElementById("user-info").innerHTML = "You are <b>not</b> signed in."
+                document.getElementById("user-info").innerHTML = "You are <strong>not</strong> signed in."
                 //erase user info
                 document.getElementById("login").style.display = "block";
                 document.getElementById("signoff").style.display = "none";
@@ -414,13 +369,11 @@
                 uName = "";
 
                 
-                document.getElementById("score-display").innerHTML = "<strong>Please Login to Record Progress<strong> " ;// scr.length;//.value[0].scores;//String(scr.value[0]);
+                document.getElementById("score-display").innerHTML = "<strong>If you wish to record your progress, please sign in above with your Google account.</strong> " ;// scr.length;//.value[0].scores;//String(scr.value[0]);
                    
                      
         
             }).catch((error) => { 
-
-
                 //console.log(error)
                 alert(errorMessage);
             });
