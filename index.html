@@ -24,20 +24,6 @@
         return val
     }
 
-    function fillRandom() {
-        /*
-        * This function randomly inputs data into the form; this is for debug use
-        */
-        for (let i = 1; i <= 17; i++) {
-            let num = Math.floor(Math.random() * 4);
-            if (i == 9) {
-                num = num % 2;
-            }
-            document.getElementsByName("q"+i)[num].checked=true
-        }
-    }
-
-
 </script>
 <body>
     <h1>MHCheck</h1>
@@ -198,8 +184,6 @@
     <p>If that is the case, we encourage you to consult a mental health professional to better understand what is happening and how to handle it best. </p>
     <p>In the meantime, you can refer to <a href= https://www.healthline.com/health/mental-health/depression-and-anxiety#treatment>this</a> article for more information and guidance.</p>
     </form>
-    <!--TODO: remove after debugging complete-->
-    <button name="fill random" onclick="fillRandom();">Fill with random answers</button>    
     <script type="module">
         /*
         * The following module deals with all of the firebase implementation, including implementing google login,
@@ -251,6 +235,10 @@
                 if (docSnap.exists()) {
                     try { //if the user has taken the quiz before, simply display the latest score
                         var scr = docSnap.get("scores");
+                        console.log(scr.length);
+                        if (scr.length == undefined) {
+                            throw new error;
+                        }
                         if(scr.length != 0){
                             document.getElementById("score-display").innerHTML = "<strong>Your latest MHCheck score was:<strong> " + scr[scr.length-1] ;
                         }
